@@ -7,3 +7,9 @@ SwipeHire is a web application that helps college students efficiently find job 
 Business Need / Why:
 
 College students often struggle to navigate complex job boards or identify roles aligned with their backgrounds. Traditional job portals are time-consuming and lack personalization for early-career candidates. SwipeHire streamlines the discovery process by letting users indicate quick preferences and view clear ‘match percentages’ with no additional cost, improving student engagement and helping universities or career centers integrate smarter matching tools.
+
+
+To run the app, clone the repo to you local device then run the following commands:
+
+npm run install 
+npm run dev 
