@@ -1,30 +1,41 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-export default function Login() {
+export default function Login(){
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [msg, setMsg] = useState('')
   const nav = useNavigate()
 
-  const onSubmit = (e) => {
+  const onSubmit = (e)=>{
     e.preventDefault()
-    // no backend yet — pretend success
+    // simple fake validation
+    if(!email.includes('@')) return setMsg('Enter a valid email.')
+    if(password.length < 4) return setMsg('Password must be at least 4 characters.')
+    localStorage.setItem('swipehire_auth','true')
     nav('/swipe')
   }
 
   return (
-    <div style={{ padding: 24 }}>
-      <h2>Login</h2>
-      <form onSubmit={onSubmit} style={{ display: 'grid', gap: 12, maxWidth: 360 }}>
-        <input placeholder="Email" value={email} onChange={e=>setEmail(e.target.value)} />
-        <input placeholder="Password" type="password" value={password} onChange={e=>setPassword(e.target.value)} />
-        <button style={{ padding: '10px 14px', borderRadius: 10, border: 'none', background: '#4f46e5', color: 'white', fontWeight: 700 }}>
-          Continue
-        </button>
-      </form>
-      <p style={{ marginTop: 12, color: '#64748b' }}>
-        (No backend yet — this just routes you to the Swipe deck.)
-      </p>
+    <div className="container">
+      <div className="card card-lg" style={{ maxWidth: 520, margin: '40px auto' }}>
+        <h2>Login</h2>
+        <p className="muted" style={{ marginTop:0 }}>No backend yet—this is a simple local prototype.</p>
+        <form onSubmit={onSubmit} className="stack" style={{ marginTop:12 }}>
+          <div>
+            <div style={{ fontWeight:700, marginBottom:6 }}>Email</div>
+            <input className="input" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@umass.edu" />
+          </div>
+          <div>
+            <div style={{ fontWeight:700, marginBottom:6 }}>Password</div>
+            <input className="input" type="password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="••••••••" />
+          </div>
+          {msg && <div className="muted" style={{ color:'var(--danger)' }}>{msg}</div>}
+          <div className="row" style={{ justifyContent:'flex-end' }}>
+            <button className="btn btn-primary">Continue</button>
+          </div>
+        </form>
+      </div>
     </div>
   )
 }
