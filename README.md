@@ -10,7 +10,7 @@ College students often struggle to navigate complex job boards or identify roles
 
 How to Run the program:
 
-To run the app, clone the repo to you local device then run the following commands:
-cd into the SwipeHire/frontend folder
-Run: npm install 
-Run: npm run dev 
+- To run the app, clone the repo to you local device then run the following commands:
+- cd into the SwipeHire/frontend folder
+- Run: npm install 
+- Run: npm run dev 
