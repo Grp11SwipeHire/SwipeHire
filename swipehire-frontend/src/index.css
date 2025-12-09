@@ -2,20 +2,21 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap');
 
 :root{
-  --bg: #0b1020;                 /* app background */
-  --bg-soft: #0f152b;            /* sections background */
-  --card: #111936;               /* cards */
-  --card-border: #1f2a4d;
+  --bg: #881c1c;                 /* app background */
+  --bg-soft: #a81e1e;            /* sections background */
+  --card: #4b0c12;               /* cards */
+  --card-border: #4d1f1f;
   --text: #e6e9f5;               /* main text */
-  --muted: #9aa4c7;              /* secondary text */
-  --primary: #6c5ce7;            /* primary brand color */
-  --primary-ink: #e8e7ff;
-  --chip-bg: #1b2143;
-  --chip-ink: #b9c1ff;
+  --muted: #ececec;              /* secondary text */
+  --primary: #f8bda4;            /* primary brand color */
+  --primary-ink: #000000;
+  --chip-bg: #431b1b;
+  --chip-ink: #ffffff;
   --danger: #ef4444;
   --success: #22c55e;
   --shadow: 0 12px 30px rgba(0,0,0,.35);
   --radius: 16px;
+  --nav-bg: #4b0c12
 }
 
 /* ======= Base Reset ======= */
@@ -24,11 +25,21 @@ html, body, #root{ height:100%; }
 body{
   margin:0;
   font-family: 'Outfit', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background: var(--bg);  /* plain maroon base */
+  color: var(--text);
+}
+
+/* ======= Landing backgrounds ======= */
+.landing-hero{
   background:
     radial-gradient(1400px 900px at -10% -10%, #1a2244 0%, rgba(26,34,68,0) 60%),
     radial-gradient(1400px 900px at 110% 110%, #1a2244 0%, rgba(26,34,68,0) 60%),
     var(--bg);
-  color: var(--text);
+}
+.landing-about{
+  background:
+    radial-gradient(1400px 900px at 110% -10%, #1a2244 0%, rgba(26,34,68,0) 60%),
+    var(--bg);
 }
 
 /* ======= Layout ======= */
@@ -61,7 +72,7 @@ h1,h2,h3{ margin: 0 0 8px 0; }
   position: sticky; top:0; z-index:10;
   display:flex; align-items:center; gap:16px;
   height:64px; padding: 0 18px;
-  background: rgba(15, 21, 43, .8);
+  background: var(--nav-bg);
   backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--card-border);
 }
@@ -106,3 +117,52 @@ h1,h2,h3{ margin: 0 0 8px 0; }
 .grid-2{ display:grid; grid-template-columns: 1fr 280px; gap: 14px; }
 .stack{ display:grid; gap:16px; }
 .row{ display:flex; gap:12px; align-items:center; }
+
+/* ===== Swipe layout ===== */
+.swipe-layout{
+  display:grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap:24px;
+  align-items:flex-start;
+}
+.filter-card{
+  background:#f6f8ef;
+  color:#111827;
+  border-radius:20px;
+  padding:20px;
+  box-shadow:var(--shadow);
+  border:none;
+}
+.filter-input{
+  width:100%;
+  margin-top:4px;
+  padding:10px 12px;
+  border-radius:999px;
+  border:none;
+  background:#505759;
+  color:#f6f8ef;
+  font-size:13px;
+  outline:none;
+}
+.filter-input::placeholder {
+  color: #bfc3c4;
+  opacity: 1;
+}
+.job-card-light{
+  background:#f6f8ef;
+  color:#111827;
+  border-radius:20px;
+  box-shadow:var(--shadow);
+}
+.swipe-actions{
+  justify-content:center;
+  gap:12px;
+}
+.swipe-actions .btn-ghost{
+  background:#f5d0c5;
+  color:#111827;
+}
+.swipe-actions .btn-primary{
+  background:#22c55e;
+  color:#ffffff;
+}
