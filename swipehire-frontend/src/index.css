@@ -25,11 +25,21 @@ html, body, #root{ height:100%; }
 body{
   margin:0;
   font-family: 'Outfit', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background: var(--bg);  /* plain maroon base */
+  color: var(--text);
+}
+
+/* ======= Landing backgrounds ======= */
+.landing-hero{
   background:
     radial-gradient(1400px 900px at -10% -10%, #1a2244 0%, rgba(26,34,68,0) 60%),
     radial-gradient(1400px 900px at 110% 110%, #1a2244 0%, rgba(26,34,68,0) 60%),
     var(--bg);
-  color: var(--text);
+}
+.landing-about{
+  background:
+    radial-gradient(1400px 900px at 110% -10%, #1a2244 0%, rgba(26,34,68,0) 60%),
+    var(--bg);
 }
 
 /* ======= Layout ======= */
