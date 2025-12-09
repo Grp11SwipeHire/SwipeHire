@@ -9,7 +9,7 @@ export default function JobCard({ job, className = '', children }){
     >
       <div className="row" style={{ justifyContent:'space-between', alignItems:'baseline' }}>
         <h3 style={{ margin:0 }}>{job.title}</h3>
-        <span className="muted">{job.location}</span>
+        <span >{job.location}</span>
       </div>
       <div style={{ marginTop:4, fontWeight:700 }}>{job.company}</div>
       <p style={{ marginTop: 8, color: '#222' }}>{job.description}</p>
