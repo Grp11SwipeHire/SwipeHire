@@ -20,7 +20,7 @@ export default function Login(){
     <div style={{ minHeight: '100vh', background: '#505759' }}>
       <div className="container">
         <div className="card card-lg" style={{ maxWidth: 520, margin: '40px auto' }}>
-          <h2>Login</h2>
+          <h2>Welcome back!</h2>
           <p className="muted" style={{ marginTop:0 }}>
             No backend yet—this is a simple local prototype.
           </p>
