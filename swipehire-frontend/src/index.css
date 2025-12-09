@@ -117,3 +117,52 @@ h1,h2,h3{ margin: 0 0 8px 0; }
 .grid-2{ display:grid; grid-template-columns: 1fr 280px; gap: 14px; }
 .stack{ display:grid; gap:16px; }
 .row{ display:flex; gap:12px; align-items:center; }
+
+/* ===== Swipe layout ===== */
+.swipe-layout{
+  display:grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap:24px;
+  align-items:flex-start;
+}
+.filter-card{
+  background:#f6f8ef;
+  color:#111827;
+  border-radius:20px;
+  padding:20px;
+  box-shadow:var(--shadow);
+  border:none;
+}
+.filter-input{
+  width:100%;
+  margin-top:4px;
+  padding:10px 12px;
+  border-radius:999px;
+  border:none;
+  background:#505759;
+  color:#f6f8ef;
+  font-size:13px;
+  outline:none;
+}
+.filter-input::placeholder {
+  color: #bfc3c4;
+  opacity: 1;
+}
+.job-card-light{
+  background:#f6f8ef;
+  color:#111827;
+  border-radius:20px;
+  box-shadow:var(--shadow);
+}
+.swipe-actions{
+  justify-content:center;
+  gap:12px;
+}
+.swipe-actions .btn-ghost{
+  background:#f5d0c5;
+  color:#111827;
+}
+.swipe-actions .btn-primary{
+  background:#22c55e;
+  color:#ffffff;
+}

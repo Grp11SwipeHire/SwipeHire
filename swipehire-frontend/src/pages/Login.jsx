@@ -6,7 +6,7 @@ export default function Login(){
   const [password, setPassword] = useState('')
   const [msg, setMsg] = useState('')
   const nav = useNavigate()
-``
+
   const onSubmit = (e)=>{
     e.preventDefault()
     // simple fake validation
