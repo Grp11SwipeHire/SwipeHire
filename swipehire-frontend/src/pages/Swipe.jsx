@@ -1,94 +1,116 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import JobCard from '../components/JobCard.jsx'
-import { jobs as seed } from '../data/jobs.js'
+// import { jobs as seed } from '../data/jobs.js'
 
-export default function Swipe(){
-  const [queue, setQueue] = useState(seed)
-  const [liked, setLiked] = useState(()=>JSON.parse(localStorage.getItem('swipehire_likes')||'[]'))
 
-  // simple controlled inputs for filters (no logic yet)
-  const [locationFilter, setLocationFilter] = useState('')
-  const [roleFilter, setRoleFilter] = useState('')
-  const [minPayFilter, setMinPayFilter] = useState('')
+export default function Swipe() {
+  const [queue, setQueue] = useState([]);
+  const [liked, setLiked] = useState(
+    () => JSON.parse(localStorage.getItem("swipehire_likes") || "[]")
+  );
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  useEffect(()=>{
-    localStorage.setItem('swipehire_likes', JSON.stringify(liked))
-  }, [liked])
+  // keep localStorage in sync like before
+  useEffect(() => {
+    localStorage.setItem("swipehire_likes", JSON.stringify(liked));
+  }, [liked]);
 
-  const current = useMemo(()=> queue[0] ?? null, [queue])
+  // fetch jobs from backend on mount
+  useEffect(() => {
+    const userEmail =
+      localStorage.getItem("swipehire_email") || "demo@student.edu";
 
-  const pass = ()=> setQueue(q=> q.slice(1))
-  const like = ()=>{
-    if(!current) return
-    setLiked(prev => prev.find(j=>j.id===current.id) ? prev : [...prev, current])
-    setQueue(q=> q.slice(1))
+    fetch(
+      `http://127.0.0.1:8000/api/jobs/deck/?user=${encodeURIComponent(
+        userEmail
+      )}`
+    )
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to load jobs");
+        return res.json();
+      })
+      .then((data) => {
+        // map job_id -> id so existing code using job.id still works
+        setQueue(data.map((j) => ({ ...j, id: j.job_id })));
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        setError(err.message);
+        setLoading(false);
+      });
+  }, []);
+
+  const current = useMemo(() => queue[0] ?? null, [queue]);
+
+  const recordSwipe = (job, direction) => {
+    const userEmail =
+      localStorage.getItem("swipehire_email") || "demo@student.edu";
+
+    fetch("http://127.0.0.1:8000/api/swipes/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        user_email: userEmail,
+        job_id: job.id, // we mapped this from job.job_id above
+        direction, // "left" or "right"
+      }),
+    }).catch((err) => {
+      console.error("Failed to record swipe", err);
+    });
+  };
+
+  const pass = () => {
+    if (!current) return;
+    setQueue((q) => q.slice(1));
+    recordSwipe(current, "left");
+  };
+
+  const like = () => {
+    if (!current) return;
+    setLiked((prev) =>
+      prev.find((j) => j.id === current.id) ? prev : [...prev, current]
+    );
+    setQueue((q) => q.slice(1));
+    recordSwipe(current, "right");
+  };
+
+  if (loading) {
+    return (
+      <div className="container" style={{ display: "grid", placeItems: "center", gap: 16 }}>
+        <h2>Swipe Deck</h2>
+        <div>Loading jobs...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container" style={{ display: "grid", placeItems: "center", gap: 16 }}>
+        <h2>Swipe Deck</h2>
+        <div>Error loading jobs: {error}</div>
+      </div>
+    );
   }
 
   return (
-    <div className="container">
-      <h2 style={{ textAlign:'center', marginBottom:24 }}>
-        Pick up from where you left off...
-        </h2>
-      <div className="swipe-layout">
-        <div className="filter-card">
-          <h3 style={{ marginBottom:12 }}>
-            Filters
-            </h3>
-          <div style={{ fontSize:14, fontWeight:600, marginTop:8 }}>
-            Location
-            </div>
-          <input
-            className="filter-input"
-            value={locationFilter}
-            onChange={e=>setLocationFilter(e.target.value)}
-            placeholder="Enter cities/countries..."
-          />
-          <div style={{ fontSize:14, fontWeight:600, marginTop:16 }}>
-            Role
-            </div>
-          <input
-            className="filter-input"
-            value={roleFilter}
-            onChange={e=>setRoleFilter(e.target.value)}
-            placeholder="Enter keywords..."
-          />
-          <div style={{ fontSize:14, fontWeight:600, marginTop:16 }}>
-            Min. pay
+    <div className="container" style={{ display:'grid', placeItems:'center', gap:16 }}>
+      <h2>Swipe Deck</h2>
+      {current ? (
+        <>
+          <JobCard job={current}/>
+          <div className="row">
+            <button className="btn btn-ghost" onClick={pass}>Pass</button>
+            <button className="btn btn-primary" onClick={like}>Like</button>
           </div>
-          <input
-            className="filter-input"
-            value={minPayFilter}
-            onChange={e=>setMinPayFilter(e.target.value)}
-            placeholder="Enter numerical value..."
-          />
-          <p style={{ marginTop:18, fontSize:11, color:'#3f3f3f' }}>
-            Filters are visual only in this prototype. Matching logic will be added in backend.
-          </p>
+          <div className="muted">{queue.length - 1} more in deck • {liked.length} saved</div>
+        </>
+      ) : (
+        <div className="card" style={{ textAlign:'center' }}>
+          You’ve reached the end of the deck. Visit <strong>Saved</strong> to review likes.
         </div>
-        <div style={{ display:'grid', gap:12, justifyItems:'center' }}>
-          {current ? (
-            <>
-              <JobCard job={current} className="job-card-light">
-                <div className="row swipe-actions">
-                  <button className="btn btn-ghost" onClick={pass}>
-                    Pass
-                  </button>
-                  <button className="btn btn-primary" onClick={like}>
-                    Like
-                  </button>
-                </div>
-              </JobCard>
-              <div className="muted">
-                {queue.length - 1} more in deck • {liked.length} saved
-              </div>
-            </>
-          ) : (
-            <div className="card job-card-light" style={{ textAlign:'center' }}>
-              You’ve reached the end of the deck. Visit <strong>Saved</strong> to review likes.
-            </div>
-          )}
-        </div>
-      </div>
+      )}
     </div>
-  )
+  );
 }
