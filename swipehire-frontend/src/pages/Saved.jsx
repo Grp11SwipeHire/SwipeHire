@@ -2,17 +2,36 @@ import React, { useEffect, useState } from 'react'
 import JobCard from '../components/JobCard.jsx'
 
 export default function Saved(){
-  const [liked, setLiked] = useState(()=>JSON.parse(localStorage.getItem('swipehire_likes')||'[]'))
+  const [liked, setLiked] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  // Fetch liked jobs from backend
   useEffect(()=>{
-    const onStorage = ()=>{
-      const raw = localStorage.getItem('swipehire_likes')
-      setLiked(raw? JSON.parse(raw):[])
-    }
-    window.addEventListener('storage', onStorage)
-    return ()=> window.removeEventListener('storage', onStorage)
+    const userEmail = localStorage.getItem('swipehire_email') || 'demo@student.edu'
+    
+    fetch(`http://127.0.0.1:8000/api/likes/?user=${encodeURIComponent(userEmail)}`)
+      .then((res) => {
+        if (!res.ok) throw new Error('Failed to load liked jobs')
+        return res.json()
+      })
+      .then((data) => {
+        setLiked(data.map((j) => ({ ...j, id: j.job_id })))
+        setLoading(false)
+      })
+      .catch((err) => {
+        console.error(err)
+        setError(err.message)
+        setLoading(false)
+        // Fallback to localStorage if backend fails
+        const localLikes = JSON.parse(localStorage.getItem('swipehire_likes') || '[]')
+        setLiked(localLikes)
+      })
   }, [])
+
   const clear = ()=>{
-    localStorage.removeItem('swipehire_likes'); setLiked([])
+    setLiked([])
+    localStorage.removeItem('swipehire_likes')
   }
 
   return (
@@ -29,7 +48,13 @@ export default function Saved(){
           <h2 style={{ textAlign: 'center', marginBottom: 24 }}>
             Saved Jobs
           </h2>
-          {liked.length===0 ? (
+          {loading ? (
+            <div className="muted" style={{ textAlign: 'center' }}>Loading saved jobs...</div>
+          ) : error ? (
+            <div className="muted" style={{ textAlign: 'center', color: 'var(--danger)' }}>
+              Error: {error}
+            </div>
+          ) : liked.length===0 ? (
             <div className="muted">No saved jobs yet. Go to <strong>Swipe</strong> and like some.</div>
           ):(
             <>
