@@ -19,10 +19,22 @@ def record_swipe(user_email: str, job_id: str, direction: str) -> Swipe:
 def get_liked_jobs(user_email: str) -> Iterable[Job]:
     """
     Return all jobs the user has swiped right on (liked).
+    Only includes jobs where the most recent swipe was "right".
+    If a job was liked then later passed, it won't appear here.
     """
-    job_ids = (
-        Swipe.objects.filter(user_email=user_email, direction="right")
-        .values_list("job__job_id", flat=True)
-        .distinct()
-    )
+    from django.db.models import Max
+    
+    job_ids = []
+    
+    all_job_ids = Swipe.objects.filter(user_email=user_email).values_list('job__job_id', flat=True).distinct()
+    
+    for job_id in all_job_ids:
+        latest_swipe = Swipe.objects.filter(
+            user_email=user_email,
+            job__job_id=job_id
+        ).order_by('-created_at').first()
+        
+        if latest_swipe and latest_swipe.direction == "right":
+            job_ids.append(job_id)
+    
     return Job.objects.filter(job_id__in=job_ids)

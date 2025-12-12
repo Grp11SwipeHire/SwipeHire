@@ -16,9 +16,25 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.http import JsonResponse
+from swipes import views as swipes_views
+
+def api_root(request):
+    """Simple API root endpoint"""
+    return JsonResponse({
+        "message": "SwipeHire API",
+        "endpoints": {
+            "jobs": "/api/jobs/deck/",
+            "swipes": "/api/swipes/",
+            "liked_jobs": "/api/likes/",
+            "admin": "/admin/",
+        }
+    })
 
 urlpatterns = [
+    path('', api_root, name='api-root'),
     path('admin/', admin.site.urls),
     path("api/jobs/", include("jobs.urls")),
     path("api/swipes/", include("swipes.urls")),
+    path("api/likes/", swipes_views.liked_jobs_view, name="likes"),
 ]
