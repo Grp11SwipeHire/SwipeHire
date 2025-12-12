@@ -13,6 +13,7 @@ export default function Login(){
     if(!email.includes('@')) return setMsg('Enter a valid email.')
     if(password.length < 4) return setMsg('Password must be at least 4 characters.')
     localStorage.setItem('swipehire_auth','true')
+    localStorage.setItem('swipehire_email', email) // Save email for backend API calls
     nav('/swipe')
   }
 
@@ -21,9 +22,6 @@ export default function Login(){
       <div className="container">
         <div className="card card-lg" style={{ maxWidth: 520, margin: '40px auto' }}>
           <h2>Welcome back!</h2>
-          <p className="muted" style={{ marginTop:0 }}>
-            No backend yet—this is a simple local prototype.
-          </p>
           <form onSubmit={onSubmit} className="stack" style={{ marginTop:12 }}>
             <div>
               <div style={{ fontWeight:700, marginBottom:6 }}>Email</div>
