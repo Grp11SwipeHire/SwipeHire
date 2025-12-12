@@ -4,8 +4,15 @@ import TagInput from '../components/TagInput.jsx'
 export default function Profile(){
   const [form, setForm] = useState(()=>{
     const saved = localStorage.getItem('swipehire_profile')
-    return saved ? JSON.parse(saved) : {
+    const parsed = saved ? JSON.parse(saved) : {
       name:'', major:'', gradYear:'', skills:[], locations:[], interests:[], resumeName:''
+    }
+    // Ensure arrays are always arrays (in case old data was stored as strings)
+    return {
+      ...parsed,
+      skills: Array.isArray(parsed.skills) ? parsed.skills : [],
+      locations: Array.isArray(parsed.locations) ? parsed.locations : [],
+      interests: Array.isArray(parsed.interests) ? parsed.interests : [],
     }
   })
   const [msg, setMsg] = useState('')
@@ -17,19 +24,42 @@ export default function Profile(){
     const f = e.target.files?.[0]
     setForm(p=>({...p, resumeName: f?f.name:''}))
   }
-  const validate = ()=>{
-    if(!form.name.trim()) return 'Please enter your name.'
-    if(!form.major.trim()) return 'Please enter your major.'
-    if(!form.gradYear.toString().trim()) return 'Please enter your graduation year.'
-    if(form.skills.length===0) return 'Add at least one skill.'
-    if(form.interests.length===0) return 'Add at least one job interest.'
+  const validate = (formData = form)=>{
+    if(!formData.name.trim()) return 'Please enter your name.'
+    if(!formData.major.trim()) return 'Please enter your major.'
+    if(!formData.gradYear.toString().trim()) return 'Please enter your graduation year.'
+    // Ensure skills is an array and has at least one item
+    const skillsArray = Array.isArray(formData.skills) ? formData.skills : []
+    if(skillsArray.length === 0) return 'Add at least one skill.'
+    // Ensure interests is an array and has at least one item
+    const interestsArray = Array.isArray(formData.interests) ? formData.interests : []
+    if(interestsArray.length === 0) return 'Add at least one job interest.'
     return ''
   }
   const save = (e)=>{
     e.preventDefault()
-    const err = validate()
-    if(err) return setMsg(err)
-    setMsg('Profile saved locally.')
+    console.log('Form state before validation:', form)
+    console.log('Skills type:', typeof form.skills, 'Skills value:', form.skills, 'Is array:', Array.isArray(form.skills))
+    console.log('Interests type:', typeof form.interests, 'Interests value:', form.interests, 'Is array:', Array.isArray(form.interests))
+    
+    const err = validate(form)
+    if(err) {
+      console.log('Validation error:', err)
+      setMsg(err)
+      return
+    }
+    localStorage.setItem('swipehire_profile', JSON.stringify(form))
+    setMsg('✓ Profile saved successfully!')
+    // Clear message after 3 seconds
+    setTimeout(() => setMsg(''), 3000)
+  }
+  
+  const clearProfile = ()=>{
+    localStorage.removeItem('swipehire_profile')
+    setForm({
+      name:'', major:'', gradYear:'', skills:[], locations:[], interests:[], resumeName:''
+    })
+    setMsg('Profile cleared. Please refresh the page.')
   }
 
   return (
@@ -62,19 +92,38 @@ export default function Profile(){
             </div>
           </div>
 
-          <TagInput label="Skills" value={form.skills}
-            onChange={(v)=>setForm(p=>({...p, skills: typeof v==='function' ? v(p.skills): v}))}
+          <TagInput label="Skills" value={Array.isArray(form.skills) ? form.skills : []}
+            onChange={(v)=>{
+              const newSkills = Array.isArray(v) ? v : (typeof v==='function' ? v(form.skills || []) : [])
+              setForm(p=>({...p, skills: newSkills}))
+            }}
             placeholder="React, SQL, Python (Enter)"/>
-          <TagInput label="Preferred Locations" value={form.locations}
-            onChange={(v)=>setForm(p=>({...p, locations: typeof v==='function' ? v(p.locations): v}))}
+          <TagInput label="Preferred Locations" value={Array.isArray(form.locations) ? form.locations : []}
+            onChange={(v)=>{
+              const newLocations = Array.isArray(v) ? v : (typeof v==='function' ? v(form.locations || []) : [])
+              setForm(p=>({...p, locations: newLocations}))
+            }}
             placeholder="Boston, Remote (Enter)"/>
-          <TagInput label="Job Interests" value={form.interests}
-            onChange={(v)=>setForm(p=>({...p, interests: typeof v==='function' ? v(p.interests): v}))}
+          <TagInput label="Job Interests" value={Array.isArray(form.interests) ? form.interests : []}
+            onChange={(v)=>{
+              const newInterests = Array.isArray(v) ? v : (typeof v==='function' ? v(form.interests || []) : [])
+              setForm(p=>({...p, interests: newInterests}))
+            }}
             placeholder="Software, Data, Product (Enter)"/>
 
-          <div className="row" style={{ justifyContent:'flex-end' }}>
-            <button className="btn btn-primary">Save Profile</button>
-            {msg && <div className="muted" style={{ color: msg.includes('saved')? 'var(--success)':'var(--danger)' }}>{msg}</div>}
+          <div className="row" style={{ justifyContent:'flex-end', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+            {msg && (
+              <div className="muted" style={{ 
+                color: msg.includes('✓') || msg.includes('saved') ? 'var(--success)' : 'var(--danger)',
+                fontWeight: msg.includes('✓') ? 'bold' : 'normal'
+              }}>
+                {msg}
+              </div>
+            )}
+            <button className="btn btn-primary" type="submit">Save Profile</button>
+            <button type="button" className="btn btn-ghost" onClick={clearProfile} style={{ fontSize: '0.85em' }}>
+              Clear Profile
+            </button>
           </div>
         </form>
       </div>
